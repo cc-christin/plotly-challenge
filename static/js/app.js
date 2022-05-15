@@ -1,23 +1,27 @@
-// get plot
+// get url
+var json_url = window.location.href + "../../samples.json";
+
 function getPlots(id) {
     // read data from samples.json
-    d3.json("samples.json").then (sampledata => {
-        console.log(sampledata)
-        var ids = sampledata.samples[0].otu_ids;
+    d3.json("samples.json").then (data => {
+        console.log(data)
+        let samples = data.samples
+        let mySamples = samples.filter(sample=> sample.id == id)
+        console.log(mySamples)
+        let ids = mySamples[0].otu_ids;
         console.log(ids)
         // * Use `sample_values` as the values for the bar chart.
-        var sampleValues = sampledata.samples[0].sample_values.slice(0, 10).reverse();
+        let sampleValues = mySamples[0].sample_values.slice(0, 10).reverse();
         console.log(sampleValues)
         // * Use `otu_labels` as the hovertext for the chart.
-        var labels = sampledata.samples[0].otu_labels.slice(0,10);
+        let belly_labels = mySamples[0].otu_labels;
+        let labels = mySamples[0].otu_labels.slice(0,10);
         console.log (labels)
         // for labels, get (0,10), .reverse()
-        var OTU_ten = (sampledata.samples[0].otu_ids.slice(0,10)).reverse();
+        let OTU_ten = (mySamples[0].otu_ids.slice(0,10)).reverse();
         // otu_ids
-        var OTU_id = OTU_ten.map(d => "OTU" + d);
+        let OTU_id = OTU_ten.map(d => "OTU" + d);
         console.log(`OTU IDS: ${OTU_id}`)
-        // labels
-        var labels = sampledata.samples[0].otu_labels.slice(0,10);
         console.log(`OTU labels: ${labels}`)
         // trace
         var trace = {
@@ -29,8 +33,9 @@ function getPlots(id) {
                 type: "bar", 
                 orientation: "h",
             };
+
             // create the variable for data
-            var data = [trace];
+            let dataPlot = [trace];
 
             // create layout
             var layout = {
@@ -51,14 +56,14 @@ function getPlots(id) {
 
             // bubble chart
             var trace1 = {
-                x: sampledata.samples[0].otu_ids,
-                y: sampledata.samples[0].sample_values,
+                x: mySamples[0].otu_ids,
+                y: mySamples[0].sample_values,
                 mode: "markers",
                 marker: {
-                    size: sampledate.samples[0].sample_values,
-                    color: sampledata.samples[0].otu_ids
+                    size: mySamples[0].sample_values,
+                    color: mySamples[0].otu_ids
                 },
-                text: sampledata.samples[0].otu_labels
+                text: mySamples[0].otu_labels
             };
 
             // bubble plot layout
@@ -103,11 +108,13 @@ function getInfo(id) {
     });
 } 
 
+/*
 // change function
 function optionChanged(id) {
     getPlots(id);
     getdemoInfo(id);
 }
+*/ 
 
 // initial function
 function init() {
@@ -115,8 +122,17 @@ function init() {
     var dropdown = d3.select("#selDataset");
 
     // read data
-    d3.json("samples.json").then((data) => {
+    d3.json("static/samples.json").then(data => {
         console.log(data)
+        for (let i = 0; i < data["names"].length; i++) {
+            let select_id = data["names"][i];
+            dropdown
+                .append("option")
+                .text(select_id)
+                .attr("value", select_id);
+            }
+        });
+
 
         // get id data
         data.namesforEach(function(name) {
@@ -127,8 +143,21 @@ function init() {
         getPlots(data.names[0]);
         getdemoInfo(data.names[0]);
 
-    });
-}
+    };
+
+
+
+
 
 init();
 
+// let dropdown menu
+let dropdown = d3.select('#selDataset');
+// dropdown event listener
+dropdown.on('click', ()=>{
+    let id = dropdown.property('value')
+    // console log
+    console.log(id)
+    getPlots(id);
+    getdemoInfo(id);
+})
