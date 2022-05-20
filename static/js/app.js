@@ -131,19 +131,20 @@ function init() {
                 .text(select_id)
                 .attr("value", select_id);
             }
+                // get id data
+                data.names.forEach(function(name) {
+                    dropdown.append("option").text(name).property("value");
+                });
+        
+                // display data and plots
+                getPlots(data.names[0]);
+                getdemoInfo(data.names[0]);
         });
 
 
-        // get id data
-        data.namesforEach(function(name) {
-            dropdown.append("option").text(name).property("value");
-        });
 
-        // display data and plots
-        getPlots(data.names[0]);
-        getdemoInfo(data.names[0]);
 
-    };
+    }
 
 
 
